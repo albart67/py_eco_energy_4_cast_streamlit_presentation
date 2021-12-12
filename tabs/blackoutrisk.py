@@ -20,35 +20,34 @@ def run():
     daily_shortage = pd.read_csv('daily_shortage.csv', 
                                  sep = ',')
      
-    daily_shortage = daily_shortage[daily_shortage['Shortage'] > 0]
+    daily_shortage_pos = daily_shortage[daily_shortage['Shortage'] > 0]
 
-    daily_shortage['Shortage'] /= 2
+    daily_shortage_pos['Shortage'] /= 2
 
-    fig1 = px.line(daily_shortage,
+    max_val = daily_shortage_pos['Shortage'].max()
+    max_date = daily_shortage_pos[daily_shortage_pos['Shortage'] == max_val]['Date']
+    max_2_person_households = int(round(max_val*1000 / 5.5,0))
+
+    fig1 = px.line(daily_shortage_pos,
                    x = 'Date', y = 'Shortage',
                    #range_y = [-10,10], 
                    title = 'National electricity shortage', 
-                   labels = {'Shortage': 'MWh', 'Date':'Date'})
+                   labels = {'Shortage': 'MWh', 'Date':'Date'},
+                   width=800)
 
     fig1.update_xaxes(showgrid=False, zeroline= False)
     fig1.update_yaxes(showgrid=False, zeroline= False)
     
     fig1.update_layout(showlegend=False)
+    
     st.write(fig1)
+    
+    col1, col2, col3, col4 = st.columns(4)
+    col2.metric('Shortage days', str(round(len(daily_shortage_pos) / len(daily_shortage)*100,1))+' %')
+    col3.metric('Max shortage', str(max_val)+' MWh')
+    col4.metric('Max 2P households', str(max_2_person_households))    
 
-    max_val = daily_shortage['Shortage'].max()
-    max_date = daily_shortage[daily_shortage['Shortage'] == max_val]['Date']
-    max_2_person_households = int(round(max_val*1000 / 5.5,0))
-
-    st.markdown(
-    '''
-    * Energy shortage is the difference between energy supply and energy consumption.
-    * The maximum value is '''+str(max_val)+''' MWh on '''+str(pd.to_datetime(max_date[1655]).month_name())+''' '''+str(pd.to_datetime(max_date[1655]).day)+str(', ')+str(pd.to_datetime(max_date[1655]).year)+str('.')+'''
-    * On this date, '''+str(max_2_person_households)+''' two-person households would theoretically suffer from energy shortage.
-    '''
-     )
-   
-   
+    
     ##############################
     # Read a file for second chart
     df_blackout = pd.read_csv('df_blackout.csv', sep = ',', index_col='Unnamed: 0')
@@ -71,13 +70,15 @@ def run():
     plot_df = plot_df.astype({'warm_month':'str'})
 
     # Plot the data
+           
     fig2 = px.scatter(plot_df, 
                       x = 'Electricity consumption (GWh)', 
                       y = 'Persons affected',
                       color = 'warm_month', 
                       title = 'Regional blackout risk for '+ region,
                       labels={"warm_month": '',},
-                      category_orders = {'warm_month': ['0.0','1.0']})
+                      category_orders = {'warm_month': ['0.0','1.0']},
+                      width=800)
     
     fig2.update_xaxes(showgrid=False, zeroline= False)
     fig2.update_yaxes(showgrid=False, zeroline= False)
@@ -89,15 +90,9 @@ def run():
                                       hovertemplate = t.hovertemplate.replace(t.name, newnames[t.name])
                                      )
                   )
-    
     st.write(fig2)
-
-    st.markdown(
-    '''
-    * We define regional blackout risk as the number of persons that are affected from energy shortage in that region.
-    * The number of persons affected equals regional energy shortage divided by the average electricity consumption per person in this region. 
-    * During warm month (May - September), the effect of energy shortage affects a higher number of people than during colder months.
-    * Possible explanation: Energy suppliers expect lower consumption during summer and therefore supply lower amounts of energy, which could lead to energy shortage when consumption peaks unexpectedly.
-    * Centre-Val de Loire, as an energy exporter, has a higher risk of energy shortage at low values of energy consumption compared with other regions.
-    '''
-    )
+    
+    col1, col2, col3, col4 = st.columns(4)
+    col2.metric('Max persons', int(round(plot_df['Persons affected'].max(),0)))
+    col3.metric('> 500 persons', str(len(plot_df[plot_df['Persons affected']>500]))+' days')
+    col4.metric('> 500 persons', str(round(len(plot_df[plot_df['Persons affected']>500])/len(plot_df['Persons affected'])*100,1))+' %')

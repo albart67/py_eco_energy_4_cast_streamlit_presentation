@@ -76,16 +76,6 @@ def run():
     
     st.write(fig1)
 
-    st.markdown(
-    '''
-    * There is a negative correlation between energy consumption and temperature for values up until 15 - 20 C°.
-    * Once the temperature rises above this level, the energy consumption rises as well.
-    * The correlation, especially for temperature values above 20 C° is not the same for each region; e.g. energy consumption in Provence-Alpes-Côte d’Azure (right) rises much more with an increase of temperature above 20 C° as compared to Bretagne (middle).
-    * We assume that for a temperature like 23 C° people in hot regions like Provence-Alpes-Côte d'Azur start their cooling systems while people in Bretagne don’t (maybe the latter are not even used to cooling and enjoy the warm temperature).
-    * Another reason for the different correlation above 20 C° could be the increasing number of tourists during the summer season in Provence-Alpes-Côte d’Azur.
-    '''
-    )
-
     
     # Polynomial model
 
@@ -178,16 +168,9 @@ def run():
 
     st.write(fig2)
 
-    st.markdown(
-    '''
-    * The test R² is similar to the train R², indicating that the model performs well.
-    * The test RMSE is just .1 higher than the train RMSE, a proof that the model is not overfitted and generalizes well.
-    * The test R² indicates that temperature variance explains about 76 % of energy consumption variance.
-    * The mean absolute percentage error of our prediction is '''+str(round(abs(lin_res['percentage errors']).mean()*100,1))+''' %.
-    * We calculated the Fisher test statistic and found that the temperature is significant for predicting energy consumption.
-    * A model based on a time series split cross-validation with ten splits has a mean RMSE of 35.3 +/- 1.9. This shows that our linear model works well.
-    '''
-    )
+    col1, col2, col3 = st.columns(3)
+    col2.metric('Test R²', str(pipe.score(X_test[:, np.newaxis], y_test).round(2)*100)+' %')
+    col3.metric('MAPE', str(round(abs(lin_res['percentage errors']).mean()*100,1))+' %')
     
     
     

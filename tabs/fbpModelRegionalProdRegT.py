@@ -110,24 +110,7 @@ def run():
         
         - For wind energy production, the MAPE is better using the original dataset, number of data still important.
                      
-        - The results with regressor are best in the sunniest regions like Provence-Alpes Côte d’Azur or Occitanie. High production give better results.
-   
-           
-           
-           
-           
-           
-        Conclusion
-           
-        Way to make evolute our mmodels :
-        - A larger weather dataset (yearly wind speed , sunshine,..)
-        - Economical datas about energies invest in the different regions.
-        - Adding holidays in the time series.
-        
-        Forecasting the green energies production will be a key factor for the energetic transition to manage the
-        electricity transmission network.
-        
-       
+        - The results with regressor are best in the sunniest regions like Provence-Alpes Côte d’Azur or Occitanie. High production give better results.    
         """
     )
 
