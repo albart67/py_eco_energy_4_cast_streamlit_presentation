@@ -26,7 +26,9 @@ def run():
 
     max_val = daily_shortage_pos['Shortage'].max()
     max_date = daily_shortage_pos[daily_shortage_pos['Shortage'] == max_val]['Date']
-    max_2_person_households = int(round(max_val*1000 / 5.5,0))
+    # https://en.selectra.info/energy-france/guides/tips/bills/average: 
+    # 2 person household electricity consumption: 1669 kWh / year
+    max_2_person_households = int(round(max_val*1000 / (1669/365),0))
 
     fig1 = px.line(daily_shortage_pos,
                    x = 'Date', y = 'Shortage',
